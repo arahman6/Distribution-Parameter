@@ -1,30 +1,54 @@
+library(shinydashboard)
 
-# This is the user-interface definition of a Shiny web application.
-# You can find out more about building applications with Shiny here:
-#
-# http://shiny.rstudio.com
-#
-
-library(shiny)
-
-shinyUI(fluidPage(
-
-  # Application title
-  titlePanel("Old Faithful Geyser Data"),
-
-  # Sidebar with a slider input for number of bins
-  sidebarLayout(
-    sidebarPanel(
-      sliderInput("bins",
-                  "Number of bins:",
-                  min = 1,
-                  max = 50,
-                  value = 30)
+dashboardPage(
+    dashboardHeader(title = "Basic dashboard"),
+    dashboardSidebar(
+        sidebarMenu(
+            menuItem("Plot", tabName = "dashboard", icon = icon("line-chart")),
+            selectInput("distName", label = "Distribution Name" ,choices = as.character(c(distrib_name,"")), selected = ""),
+            menuItem("ReadMe", tabName = "readme", icon = icon("th")),
+            menuItem("About", tabName = "about", icon = icon("question"))
+        )
     ),
+    dashboardBody(
+        tabItems(
+            tabItem(
+                tabName = "dashboard",
+                # Boxes need to be put in a row (or column)
+                fluidRow(
+                    box(
+                        title = "Probability Density Function", status = "primary", solidHeader = TRUE,
+                        plotOutput("plot1", height = 250)
+                    ),
+                    box(
+                        title = "Cumulative Distribution Function", status = "primary", solidHeader = TRUE,
+                        plotOutput("plot2", height = 250)
+                    )
+                    
 
-    # Show a plot of the generated distribution
-    mainPanel(
-      plotOutput("distPlot")
+                ),
+                
+                fluidRow(
+                    box(
+                        title = "Parameters Controlers",status = "primary", solidHeader = TRUE,
+                        uiOutput("sliderPar1"),
+                        uiOutput("sliderPar2"),
+                        uiOutput("sliderPar3")
+                    ),
+                    infoBoxOutput("infoMean"),
+                    infoBoxOutput("infoVarience")
+                    
+                )
+            ),
+            tabItem(
+                tabName = "readme",
+                h1("dsfgas")
+            ),
+            tabItem(
+                tabName = "about",
+                "arahman.isrt@gmail.com"
+            )
+        )
+        
     )
-  )
-))
+)

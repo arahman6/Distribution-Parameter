@@ -1,0 +1,4 @@
+distrib_name,distrib_typ,number_par,pdf,cdf,min_lim,max_lim,max_lim_y,par1_min,par1_max,par1_default,par2_min,par2_max,par2_default,par3_min,par3_max,par3_default,par1_exp,par2_exp,par3_exp
+Normal,continuous,2,dnorm,pnorm,-400,400,0.045,-100,100,0,1,100,50,NA,NA,NA,&mu;:,&sigma;:,NA
+Weibull,continuous,2,dweibull,pweibull,0,20,0.8,0,5,1,0,5,2,NA,NA,NA,&mu;:,&mu;:,NA
+Poisson,discrete,1,dpois,ppois,0,25,0.5,1,15,1,NA,NA,NA,NA,NA,NA,&lambda;:,NA,NA
