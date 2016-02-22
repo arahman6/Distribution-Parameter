@@ -11,8 +11,8 @@ F,continuous,2,df,pf,rf,0,4,2.5,0.1,1,100,1,1,100,2,NA,NA,NA,degrees of freedom 
 Gamma,continuous,2,dgamma,pgamma,rgamma,0,15,0.5,0.1,1,15,1,0,5,2,NA,NA,NA,shape k:,rate &theta;:,NA
 Geometric,discrete,1,dgeom,pgeom,rgeom,0,10,1,0.1,0,1,0.5,NA,NA,NA,NA,NA,NA,probability p:,NA,NA
 Hypergeometric,discrete,3,dhyper,phyper,rhyper,0,25,0.5,0.1,10,50,20,10,50,20,1,5,10,m:,n:,k:
-Logistic,continuous,2,dlogis,plogis,rlogis,0,25,0.5,0.1,1,15,1,0,5,2,NA,NA,NA,&lambda;:,&mu;:,NA
-Log Normal,continuous,2,dlnorm,plnorm,rlnorm,0,25,0.5,0.1,1,15,1,0,5,2,NA,NA,NA,&lambda;:,&mu;:,NA
-Negative Binomial,continuous,2,dnbinom,pnbinom,rnbinom,0,25,0.5,0.1,1,15,1,0,5,2,NA,NA,NA,&lambda;:,&mu;:,NA
-Student t,continuous,1,dt,pt,rt,0,25,0.5,0.1,1,15,1,NA,NA,NA,NA,NA,NA,&lambda;:,NA,NA
-Uniform,discrete,2,dunif,punif,runif,0,25,0.5,0.1,1,15,1,0,5,2,NA,NA,NA,&lambda;:,&mu;:,NA
+Logistic,continuous,2,dlogis,plogis,rlogis,-20,20,0.5,0.1,-10,10,0,1,4,2,NA,NA,NA,&mu;::,shape s:,NA
+Log Normal,continuous,2,dlnorm,plnorm,rlnorm,0,2.5,1.5,0.1,0,5,1,0,5,2,NA,NA,NA,log-mean &mu;:,log-sd &sigma;:,NA
+Negative Binomial,continuous,2,dnbinom,pnbinom,rnbinom,0,25,0.15,0.1,1,40,1,0,1,0.5,NA,NA,NA,size r:,probability p:,NA
+Student t,continuous,1,dt,pt,rt,-20,20,0.5,0.1,1,15,1,NA,NA,NA,NA,NA,NA,degrees of freedom d1:,NA,NA
+Uniform,discrete,2,dunif,punif,runif,0,25,0.5,0.1,1,15,1,1,15,10,NA,NA,NA,minimum a:,maximum b:,NA
