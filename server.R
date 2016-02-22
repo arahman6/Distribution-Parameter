@@ -2,123 +2,268 @@ library(ggplot2)
 
 
 function(input, output, session) {
+    index.p <- reactive(which(distrib_name == input$distName))
     output$plot1 <- renderPlot({
-        if(distrib_typ[distrib_name==input$distName]=="continuous"){
-            p <- ggplot(data.frame(x = c(min_lim[distrib_name==input$distName],
-                                         max_lim[distrib_name==input$distName])), aes(x)) +
-                stat_function(fun = as.character(pdf[distrib_name==input$distName]), 
-                              args = c(input$par1, input$par2, input$par3)[!is.na(c(input$par1, input$par2, input$par3))], 
-                              colour = "red", geom = "area", fill = "red", alpha = I(0.5)) +
-                coord_cartesian(xlim=c(min_lim[distrib_name==input$distName],
-                                       max_lim[distrib_name==input$distName]),
-                                ylim=c(0,max_lim_y[distrib_name==input$distName]))
-            return(p)
-        }
+        if (input$distName == "") {return()}
         else{
-            p <- ggplot(data.frame(x = c(min_lim[distrib_name==input$distName]:
-                                         max_lim[distrib_name==input$distName])), aes(x)) +
-                stat_function(fun = as.character(pdf[distrib_name==input$distName]), 
-                              args = c(input$par1, input$par2, input$par3)[!is.na(c(input$par1, input$par2, input$par3))], 
-                              colour = "red", geom = "bar", 
-                              n=abs(min_lim[distrib_name==input$distName]-max_lim[distrib_name==input$distName])+1, 
-                              alpha = I(0.5)) +
-                coord_cartesian(xlim=c(min_lim[distrib_name==input$distName],
-                                       max_lim[distrib_name==input$distName]),
-                                ylim=c(0,max_lim_y[distrib_name==input$distName]))
-            return(p)
+            if (distrib_typ[index.p()] == "continuous") {
+                p <- ggplot(data.frame(x = c(min_lim[index.p()],
+                                             max_lim[index.p()])), aes(x)) +
+                    stat_function(fun = as.character(pdf.dist[index.p()]), 
+                                  args = c(input$par1, input$par2, input$par3)[!is.na(c(input$par1, input$par2, input$par3))], 
+                                  colour = "red", geom = "area", fill = "red", alpha = I(0.5)) +
+                    stat_function(fun = as.character(pdf.dist[index.p()]), 
+                                  args = c(input$par1_2, input$par2_2, input$par3_2)[!is.na(c(input$par1_2, input$par2_2, input$par3_2))], 
+                                  colour = "blue", geom = "area", fill = "blue", alpha = I(0.5)) +
+                    coord_cartesian(xlim = c(min_lim[index.p()],
+                                           max_lim[index.p()]),
+                                    ylim = c(0,max_lim_y[index.p()]))
+                return(p)
+            }
+            else{
+                p <- ggplot(data.frame(x = c(min_lim[index.p()]:max_lim[index.p()])), aes(x)) +
+                    stat_function(fun = as.character(pdf.dist[index.p()]), 
+                                  args = c(input$par1, input$par2, input$par3)[!is.na(c(input$par1, input$par2, input$par3))], 
+                                  colour = "red", geom = "bar", fill = "red",
+                                  n = abs(min_lim[index.p()] - max_lim[index.p()]) + 1, 
+                                  alpha = I(0.5)) +
+                    stat_function(fun = as.character(pdf.dist[index.p()]), 
+                                  args = c(input$par1_2, input$par2_2, input$par3_2)[!is.na(c(input$par1_2, input$par2_2, input$par3_2))], 
+                                  colour = "blue", geom = "bar", fill = "blue",
+                                  n = abs(min_lim[index.p()] - max_lim[index.p()]) + 1, 
+                                  alpha = I(0.5)) +
+                    coord_cartesian(xlim = c(min_lim[index.p()],
+                                           max_lim[index.p()]),
+                                    ylim = c(0,max_lim_y[index.p()]))
+                return(p)
+            }
         }
     })
     
     output$plot2 <- renderPlot({
-        if(distrib_typ[distrib_name==input$distName]=="continuous"){
-            p <- ggplot(data.frame(x = c(min_lim[distrib_name==input$distName],
-                                         max_lim[distrib_name==input$distName])), aes(x)) +
-                stat_function(fun = as.character(cdf[distrib_name==input$distName]), 
-                              args = c(input$par1, input$par2, input$par3)[!is.na(c(input$par1, input$par2, input$par3))], 
-                              colour = "red", size = 1, alpha = I(0.5)) +
-                coord_cartesian(xlim=c(min_lim[distrib_name==input$distName],
-                                       max_lim[distrib_name==input$distName]))
-            return(p)
-        }
+        if (input$distName == "") {return()}
         else{
-            p <- ggplot(data.frame(x = c(min_lim[distrib_name==input$distName]:
-                                             max_lim[distrib_name==input$distName])), aes(x)) +
-                stat_function(fun = as.character(cdf[distrib_name==input$distName]), 
-                              args = c(input$par1, input$par2, input$par3)[!is.na(c(input$par1, input$par2, input$par3))],
-                              geom = "step",
-                              colour = "red", size = 1, alpha = I(0.5)) +
-                coord_cartesian(xlim=c(min_lim[distrib_name==input$distName],
-                                       max_lim[distrib_name==input$distName]))
-            return(p)
+            if (distrib_typ[index.p()] == "continuous") {
+                p <- ggplot(data.frame(x = c(min_lim[index.p()],
+                                             max_lim[index.p()])), aes(x)) +
+                    stat_function(fun = as.character(cdf.dist[index.p()]), 
+                                  args = c(input$par1, input$par2, input$par3)[!is.na(c(input$par1, input$par2, input$par3))], 
+                                  colour = "red", size = 1, alpha = I(0.5)) +
+                    stat_function(fun = as.character(cdf.dist[index.p()]), 
+                                  args = c(input$par1_2, input$par2_2, input$par3_2)[!is.na(c(input$par1_2, input$par2_2, input$par3_2))], 
+                                  colour = "blue", size = 1, alpha = I(0.5)) +
+                    coord_cartesian(xlim = c(min_lim[index.p()],
+                                           max_lim[index.p()]))
+                return(p)
+            }
+            else{
+                p <- ggplot(data.frame(x = c(min_lim[index.p()]:max_lim[index.p()])), aes(x)) +
+                    stat_function(fun = as.character(cdf.dist[index.p()]), 
+                                  args = c(input$par1, input$par2, input$par3)[!is.na(c(input$par1, input$par2, input$par3))],
+                                  geom = "step",
+                                  colour = "red", size = 1, alpha = I(0.5)) +
+                    stat_function(fun = as.character(cdf.dist[index.p()]), 
+                                  args = c(input$par1_2, input$par2_2, input$par3_2)[!is.na(c(input$par1_2, input$par2_2, input$par3_2))],
+                                  geom = "step",
+                                  colour = "blue", size = 1, alpha = I(0.5)) +
+                    coord_cartesian(xlim = c(min_lim[index.p()],
+                                           max_lim[index.p()]))
+                return(p)
+            }
         }
     })
     
-    output$sliderPar1 <- renderUI(
-        sliderInput("par1", label =  HTML(paste(par1_exp[distrib_name==input$distName])),
-                    par1_min[distrib_name==input$distName],
-                    par1_max[distrib_name==input$distName],
-                    par1_default[distrib_name==input$distName],step = step[distrib_name==input$distName])
+    output$sliderPar1_1 <- renderUI({
+        if (input$distName == "") {return()}
+        else{
+            sliderInput("par1", label =  HTML(paste(par1_exp[index.p()])),
+                        par1_min[index.p()],
+                        par1_max[index.p()],
+                        par1_default[index.p()],step = step_par1[index.p()])
+        }
+    })
+    
+    output$sliderPar2_1 <- renderUI({
+        if (input$distName == "") {return()}
+        else{
+            if (number_par[index.p()] >= 2) {
+                    sliderInput("par2", label =  HTML(paste(par2_exp[index.p()])),
+                        par2_min[index.p()],
+                        par2_max[index.p()],
+                        par2_default[index.p()],step = step_par2[index.p()])
+            }
+            else(return())
+        }
+    })
+    
+    output$sliderPar3_1 <- renderUI({
+        if (input$distName == "") {return()}
+        else{
+            if (number_par[index.p()] >= 3) {
+                sliderInput("par3", label =  HTML(paste(par2_exp[index.p()])),
+                            par3_min[index.p()],
+                            par3_max[index.p()],
+                            par3_default[index.p()],step = step_par3[index.p()])
+            }
+            else(return())
+        }
+    })
+    
+    output$sliderPar1_2 <- renderUI({
+        if (input$distName == "") {return()}
+        else{
+            sliderInput("par1_2", label =  HTML(paste(par1_exp[index.p()])),
+                        par1_min[index.p()],
+                        par1_max[index.p()],
+                        par1_default[index.p()],step = step_par1[index.p()])
+        }
+    })
+    
+    output$sliderPar2_2 <- renderUI({
+        if (input$distName == "") {return()}
+        else{
+            if (number_par[index.p()] >= 2) {
+                sliderInput("par2_2", label =  HTML(paste(par2_exp[index.p()])),
+                            par2_min[index.p()],
+                            par2_max[index.p()],
+                            par2_default[index.p()],step = step_par2[index.p()])
+            }
+            else(return())
+        }
+    })
+    
+    output$sliderPar3_2 <- renderUI({
+        if (input$distName == "") {return()}
+        else{
+            if (number_par[index.p()] >= 3) {
+                sliderInput("par3_2", label =  HTML(paste(par2_exp[index.p()])),
+                            par3_min[index.p()],
+                            par3_max[index.p()],
+                            par3_default[index.p()],step = step_par3[index.p()])
+            }
+            else(return())
+        }
+    })
+    
+    range_x <- reactive(c(min_lim[index.p()]:max_lim[index.p()]))
+    
+    text_script_mean1 <- reactive(
+        if (input$distName == "") {return()}
+        else{
+            eval(
+                parse(
+                    text = paste(
+                        "round(sum(",
+                        pdf.dist[index.p()],
+                        "(range_x(),",
+                        input$par1,
+                        if (number_par[index.p()] >= 2) {paste(",",input$par2)},
+                        if (number_par[index.p()] >= 3) {paste(",",input$par3)},
+                        ")*range_x()),2)",
+                        sep = ""
+                    )
+                )
+            )
+        }
     )
     
-    output$sliderPar2 <- renderUI({
-        if(number_par[distrib_name==input$distName]>=2){
-                sliderInput("par2", label =  HTML(paste(par2_exp[distrib_name==input$distName])),
-                    par2_min[distrib_name==input$distName],
-                    par2_max[distrib_name==input$distName],
-                    par2_default[distrib_name==input$distName],step = 0.1)
+    
+    text_script_var1 <- reactive(
+        if (input$distName == "") {return()}
+        else{
+            eval(
+                parse(
+                    text = paste(
+                        "round(sum(",
+                        pdf.dist[index.p()],
+                        "(range_x(),",
+                        input$par1,
+                        if (number_par[index.p()] >= 2) {paste(",",input$par2)},
+                        if (number_par[index.p()] >= 3) {paste(",",input$par3)},
+                        ")*((range_x() - text_script_mean1()) ^ 2)),2)",
+                        sep = ""
+                    )
+                )
+            )
         }
-        else(return())
-    })
+    )
     
-    output$sliderPar3 <- renderUI({
-        if(number_par[distrib_name==input$distName]>=3){
-            sliderInput("par3", label =  HTML(paste(par2_exp[distrib_name==input$distName])),
-                        par3_min[distrib_name==input$distName],
-                        par3_max[distrib_name==input$distName],
-                        par3_default[distrib_name==input$distName],step = 0.1)
+    text_script_mean2 <- reactive(
+        if (input$distName == "") {return()}
+        else{
+            eval(
+                parse(
+                    text = paste(
+                        "round(sum(",
+                        pdf.dist[index.p()],
+                        "(range_x(),",
+                        input$par1_2,
+                        if (number_par[index.p()] >= 2) {paste(",",input$par2_2)},
+                        if (number_par[index.p()] >= 3) {paste(",",input$par3_2)},
+                        ")*range_x()),2)",
+                        sep = ""
+                    )
+                )
+            )
         }
-        else(return())
-    })
+    )
     
     
-    output$infoMean <- renderInfoBox(
-        infoBox("Mean:",
-                switch(input$distName,
-                       Normal = input$par1,
-                       Weibull = gamma(1+1/input$par1)*input$par2,
-                       Poisson = input$par1),
+    text_script_var2 <- reactive(
+        if (input$distName == "") {return()}
+        else{
+            eval(
+                parse(
+                    text = paste(
+                        "round(sum(",
+                        pdf.dist[index.p()],
+                        "(range_x(),",
+                        input$par1_2,
+                        if (number_par[index.p()] >= 2) {paste(",",input$par2_2)},
+                        if (number_par[index.p()] >= 3) {paste(",",input$par3_2)},
+                        ")*((range_x() - text_script_mean2()) ^ 2)),2)",
+                        sep = ""
+                    )
+                )
+            )
+        }
+    )
+    
+    output$infoMean1 <- renderInfoBox({
+        infoBox("Mean:(red)",
+                text_script_mean1(),
                 icon = icon("list"),
                 color = "orange",
                 fill = TRUE
         )
-    )
-    gen_dat <- reactive(
-        rdf[distrib_name==input$distName]
-    )
-    output$infoMean_gen <- renderInfoBox(
-        infoBox(
-            "Mean:", round(mean(gen_dat()$values),4), icon = icon("list"),
-            color = "purple", fill = TRUE
-        )
-    )
-    
-    output$infoVarience_gen <- renderInfoBox(
-        infoBox(
-            "Varience:", round(var(gen_dat()$values),2), icon = icon("list"),
-            color = "purple", fill = TRUE
-        )
-    )
-    output$infoVarience <- renderInfoBox(
-        infoBox("Varience:",
-                switch(input$distName,
-                       Normal = input$par2,
-                       Weibull = (gamma(1+2/input$par1) - gamma(1+1/input$par1))*(input$par2)^2,
-                       Poisson = input$par1),
-                icon = icon("list"),
-                color = "orange",
-                fill = TRUE
-        )
-    )
-    
-}
+    })
 
+
+    output$infoVarience1 <- renderInfoBox({
+        infoBox("Varience:(red)",
+                text_script_var1(),
+                icon = icon("list"),
+                color = "orange",
+                fill = TRUE
+        )
+    })
+    
+    output$infoMean2 <- renderInfoBox({
+        infoBox("Mean:(blue)",
+                text_script_mean2(),
+                icon = icon("list"),
+                color = "orange",
+                fill = TRUE
+        )
+    })
+    
+    
+    output$infoVarience2 <- renderInfoBox({
+        infoBox("Varience:(blue)",
+                text_script_var2(),
+                icon = icon("list"),
+                color = "orange",
+                fill = TRUE
+        )
+    })
+}

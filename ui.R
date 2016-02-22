@@ -30,14 +30,25 @@ dashboardPage(
                 
                 fluidRow(
                     box(
-                        title = "Parameters Controlers",status = "primary", solidHeader = TRUE,
-                        uiOutput("sliderPar1"),
-                        uiOutput("sliderPar2"),
-                        uiOutput("sliderPar3")
+                        title = "Parameters Controlers Red",status = "primary", solidHeader = TRUE,
+                        uiOutput("sliderPar1_1"),
+                        uiOutput("sliderPar2_1"),
+                        uiOutput("sliderPar3_1")
                     ),
-                    infoBoxOutput("infoMean"),
-                    infoBoxOutput("infoVarience")
-                    
+                    box(
+                        title = "Parameters Controlers Blue",status = "primary", solidHeader = TRUE,
+                        uiOutput("sliderPar1_2"),
+                        uiOutput("sliderPar2_2"),
+                        uiOutput("sliderPar3_2")
+                    )
+                ),
+                fluidRow(
+                    infoBoxOutput("infoMean1"),
+                    infoBoxOutput("infoMean2")
+                ),
+                fluidRow(
+                    infoBoxOutput("infoVarience1"),
+                    infoBoxOutput("infoVarience2")
                 )
             ),
             tabItem(
