@@ -6,8 +6,12 @@ dashboardPage(
         sidebarMenu(
             menuItem("Plot", tabName = "dashboard", icon = icon("line-chart")),
             selectInput("distName", label = "Distribution Name" ,choices = as.character(c(distrib_name,"")), selected = ""),
-            menuItem("ReadMe", tabName = "readme", icon = icon("th")),
-            menuItem("About", tabName = "about", icon = icon("question"))
+            menuItem("Codes",  icon = icon("file-text-o"),
+                     menuSubItem("ui.R", tabName = "ui", icon = icon("angle-right")),
+                     menuSubItem("server.R", tabName = "server", icon = icon("angle-right"))
+            ),
+            menuItem("ReadMe", tabName = "readme", icon = icon("mortar-board")),
+            menuItem("Author", tabName = "author", icon = icon("question"))
         )
     ),
     dashboardBody(
@@ -51,13 +55,26 @@ dashboardPage(
                     infoBoxOutput("infoVarience2")
                 )
             ),
-            tabItem(
-                tabName = "readme",
-                h1("dsfgas")
+            tabItem(tabName = "ui",
+                    box( width = NULL, status = "primary", solidHeader = TRUE, title="ui.R",
+                         downloadButton('downloadData2', 'Download'),
+                         br(),br(),
+                         pre(includeText("ui.R"))
+                    )
             ),
-            tabItem(
-                tabName = "about",
-                "arahman.isrt@gmail.com"
+            tabItem(tabName = "server",
+                    box( width = NULL, status = "primary", solidHeader = TRUE, title="server.R",
+                         downloadButton('downloadData3', 'Download'),
+                         br(),br(),
+                         pre(includeText("server.R"))
+                    )
+            ),
+            tabItem(tabName = "readme",
+                    withMathJax(), 
+                    includeMarkdown("README.rmd")
+            ),
+            tabItem(tabName = "author",
+                    includeMarkdown("./author/author.rmd")
             )
         )
         
