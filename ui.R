@@ -1,7 +1,7 @@
 library(shinydashboard)
 
 dashboardPage(
-    dashboardHeader(title = "Basic dashboard"),
+    dashboardHeader(title = "Distribution dashboard"),
     dashboardSidebar(
         sidebarMenu(
             menuItem("Plot", tabName = "dashboard", icon = icon("line-chart")),
@@ -11,7 +11,10 @@ dashboardPage(
                      menuSubItem("server.R", tabName = "server", icon = icon("angle-right"))
             ),
             menuItem("ReadMe", tabName = "readme", icon = icon("mortar-board")),
-            menuItem("Author", tabName = "author", icon = icon("question"))
+            menuItem("Author", tabName = "author", icon = icon("user"),
+                     menuSubItem("LinkedIn", href = "https://bd.linkedin.com/in/md-arif-rahman-46934378", icon = icon("linkedin-square")),
+                     menuSubItem("GitHub", href = "https://github.com/arahman6/Distribution-Parameter", icon = icon("github-square"))
+            )
         )
     ),
     dashboardBody(
@@ -56,27 +59,23 @@ dashboardPage(
                 )
             ),
             tabItem(tabName = "ui",
-                    box( width = NULL, status = "primary", solidHeader = TRUE, title="ui.R",
+                    box( width = NULL, status = "primary", solidHeader = TRUE, title = "ui.R",
                          downloadButton('downloadData2', 'Download'),
                          br(),br(),
                          pre(includeText("ui.R"))
                     )
             ),
             tabItem(tabName = "server",
-                    box( width = NULL, status = "primary", solidHeader = TRUE, title="server.R",
+                    box( width = NULL, status = "primary", solidHeader = TRUE, title = "server.R",
                          downloadButton('downloadData3', 'Download'),
                          br(),br(),
                          pre(includeText("server.R"))
                     )
             ),
             tabItem(tabName = "readme",
-                    withMathJax(), 
-                    includeMarkdown("README.rmd")
-            ),
-            tabItem(tabName = "author",
-                    includeMarkdown("./author/author.rmd")
+                    withMathJax(),
+                    includeMarkdown("README.md")
             )
         )
-        
     )
 )
