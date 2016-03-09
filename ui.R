@@ -40,31 +40,37 @@ dashboardPage(
                 "Simple Linear Regression",
                 h3("Simple Linear Regression Model"),
                 fluidRow(
-                  selectInput(
-                    inputId = "regression_dat",
-                    label = "Data",
-                    choices = reg_data_name,
-                    selected = ""
+                  column(width = 3,
+                    selectInput(
+                      inputId = "regression_dat",
+                      label = "Data",
+                      choices = reg_data_name,
+                      selected = ""
+                    )
+                  )
+                  renderTable(),
+                  column(width = 3,
+                     uiOutput("s_reg_depen_var_ui")
                   ),
-                  checkboxInput(
-                    inputId = "load_data_sreg",
-                    label = "Load Data",
-                    value = FALSE
+                  column(width = 3,
+                     uiOutput("s_reg_indepen_var_ui")
+                  ),
+                  column(width = 3,
+                    checkboxInput(
+                      inputId = "load_data_sreg",
+                      label = "Load Data",
+                      value = FALSE
+                    )
                   ),
                   conditionalPanel(
                     "input.load_data_sreg",
                     fileInput(
                       'file1', 'Choose file to upload',
-                      accept = c(
-                        'text/csv',
-                        'text/comma-separated-values',
-                        'text/tab-separated-values',
-                        'text/plain',
-                        '.csv','.tsv','.sav','.xpt',
-                        '.dta','xlsx','xlx'
-                      )
+                      accept = c('text/csv', 'text/comma-separated-values', 'text/tab-separated-values',
+                        'text/plain', '.csv','.tsv','.sav','.xpt', '.dta','xlsx','xlx')
                     ),
                     p('Load Text, CSV, Excel, SPSS, SAS, STATA File with general settings')
+                  )
                   ),
                   fluidRow(
                     box(
@@ -77,7 +83,6 @@ dashboardPage(
                       plotOutput("s_regression_main", height = 300)
                     )
                   )
-                )
               ),
               tabPanel(
                 "Multiple Linear Regression",

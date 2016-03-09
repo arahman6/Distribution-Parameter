@@ -11,11 +11,33 @@ function(input, output, session) {
       return(NULL)
     
     read.csv(
-      inFile$datapath, header = input$header,
-      sep = input$sep, quote = input$quote
+      file = inFile$datapath, header = input$header, sep = input$sep, quote = input$quote
     )
   })
   
+  selected_reg_data1 <- reactive({paste(input$regression_dat)})
+  selected_reg_data2 <- reactive({eval(parse(as.character(selected_reg_data1())))})
+  
+  output$s_reg_depen_var_ui <- renderUI({
+    selectInput(
+      inputId = "s_reg_depen_var",
+      label = "Dependent Variable",
+      choices = c(names(selected_reg_data2()),""),
+      selected = ""
+    )
+  })
+  
+  output$s_reg_indepen_var_ui <- renderUI({
+    selectInput(
+      inputId = "s_reg_indepen_var",
+      label = "Independent Variable",
+      choices = c(names(selected_reg_data2()),""),
+      selected = ""
+    )
+  })
+  
+  
+  # s_reg_fit_lm <- lm()
   
   
   
