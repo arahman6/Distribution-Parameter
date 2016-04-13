@@ -1,29 +1,31 @@
 library(ggplot2)
+library(gridExtra)
+
+
 options(shiny.maxRequestSize = 9 * 1024 ^ 2)
 
 function(input, output, session) {
   ###############################################################################################
   #######################################Regression##############################################
+  
+  #######################################Simple##################################################
   output$contents <- renderTable({
     inFile <- input$file1
     
     if (is.null(inFile))
       return(NULL)
     
-    read.csv(
-      file = inFile$datapath, header = input$header, sep = input$sep, quote = input$quote
-    )
+    read.csv(file = inFile$datapath, header = input$header, sep = input$sep, quote = input$quote)
   })
   
-  selected_reg_data1 <- reactive({paste(input$regression_dat)})
-  selected_reg_data2 <- reactive({eval(parse(as.character(selected_reg_data1())))})
+  selected_reg_data_s <- reactive({eval(parse(text = paste(input$s_regression_dat)))})
   
   output$s_reg_depen_var_ui <- renderUI({
     selectInput(
       inputId = "s_reg_depen_var",
       label = "Dependent Variable",
-      choices = c(names(selected_reg_data2()),""),
-      selected = ""
+      choices = c(names(selected_reg_data_s()),""),
+      selected = "hp"
     )
   })
   
@@ -31,18 +33,168 @@ function(input, output, session) {
     selectInput(
       inputId = "s_reg_indepen_var",
       label = "Independent Variable",
-      choices = c(names(selected_reg_data2()),""),
-      selected = ""
+      choices = c(names(selected_reg_data_s()),""),
+      selected = "mpg"
     )
   })
   
   
-  # s_reg_fit_lm <- lm()
+  s_reg_fit_lm <- reactive({lm(selected_reg_data_s()[,colnames(selected_reg_data_s())==input$s_reg_depen_var]~selected_reg_data_s()[,colnames(selected_reg_data_s())==input$s_reg_indepen_var])})
   
+  output$s_regression_par1 <- renderUI({
+    sliderInput(
+      inputId = "s_regression_par_intercept", 
+      label = "Intercept", 
+      min = (s_reg_fit_lm()$coe[1]-5),
+      max = (s_reg_fit_lm()$coe[1]+5), 
+      value = s_reg_fit_lm()$coe[1], 
+      step = 0.01
+    )
+  })
   
+  output$s_regression_par2 <- renderUI({
+    sliderInput(
+      inputId = "s_regression_par_slope", 
+      label = "Slope", 
+      min = (s_reg_fit_lm()$coe[2]-5) ,
+      max = (s_reg_fit_lm()$coe[2]+5), 
+      value = s_reg_fit_lm()$coe[2], 
+      step = 0.01
+    )
+  })
   
+#   output$s_regression_main <- renderPlot({
+#     plot(selected_reg_data_s()[,colnames(selected_reg_data_s())==input$s_reg_indepen_var],
+#          selected_reg_data_s()[,colnames(selected_reg_data_s())==input$s_reg_depen_var],
+#          type = "p", pch = 20,col="gray",
+#          xlab=input$s_reg_indepen_var,
+#          ylab=input$s_reg_depen_var
+#     )
+#     if(input$fit_s_reg)abline(s_reg_fit_lm())
+#       else abline(a = input$s_regression_par_intercept, b = input$s_regression_par_slope)
+#     for(i in 1:nrow(selected_reg_data_s())){
+#       lines(rep(selected_reg_data_s()[i,colnames(selected_reg_data_s())==input$s_reg_indepen_var],2),
+#             c(input$s_regression_par_intercept + input$s_regression_par_slope*selected_reg_data_s()[i,colnames(selected_reg_data_s())==input$s_reg_indepen_var],
+#               selected_reg_data_s()[i,colnames(selected_reg_data_s())==input$s_reg_depen_var]),
+#             col = "red"
+#       )
+#     }
+#   })
+
+  output$s_regression_main <- renderPlot({
+    p <- ggplot(data = selected_reg_data_s(), mapping = aes(x=eval(parse(text = paste(input$s_reg_indepen_var))), y=eval(parse(text = paste(input$s_reg_depen_var)))))+
+      geom_point(size=2)+
+      geom_abline(intercept = input$s_regression_par_intercept, slope = input$s_regression_par_slope, color = "blue")+
+      xlab(input$s_reg_indepen_var)+
+      ylab(input$s_reg_depen_var)
+    
+    err_res <- c()
+    
+    for(i in 1:nrow(selected_reg_data_s())){
+      p <- p + geom_line(aes(x=x,y=y, color= "red"),
+                         data = data.frame(x=rep(selected_reg_data_s()[i,colnames(selected_reg_data_s())==input$s_reg_indepen_var],2),
+                                           y=c(input$s_regression_par_intercept + input$s_regression_par_slope*
+                                                 selected_reg_data_s()[i,colnames(selected_reg_data_s())==input$s_reg_indepen_var],
+                                               selected_reg_data_s()[i,colnames(selected_reg_data_s())==input$s_reg_depen_var])
+                                )
+               )
+        
+      err_res[i] <- selected_reg_data_s()[i,colnames(selected_reg_data_s())==input$s_reg_depen_var]-
+        (input$s_regression_par_intercept + input$s_regression_par_slope*
+           selected_reg_data_s()[i,colnames(selected_reg_data_s())==input$s_reg_indepen_var])
+    }
+    
+    p <- p + theme(legend.title=element_blank(), legend.text = element_text())+
+      scale_colour_manual(values=c("red"), breaks=c("red"), labels=c("Residuals"))
+    
+    err_res <- as.data.frame(err_res)
+    
+    ress_hist <- ggplot(mapping = aes(x=err_res), data = err_res)+
+      geom_histogram(aes(y=..density..), binwidth = 10)+
+      geom_density()+
+      xlab("Residuals")
+    
+    ress_qq <- ggplot(mapping = aes(sample = err_res), data = err_res) +
+      geom_point(stat = "qq")+
+      geom_abline(intercept = 0, slope = 45)
+    
+    ress_fit <- ggplot(data = data.frame(err_res,y = selected_reg_data_s()[,colnames(selected_reg_data_s())==input$s_reg_depen_var]),
+                       mapping = aes(x=y,y=err_res))+
+      geom_point(size=1)+
+      geom_abline(intercept = 0, slope = 0)
+    
+    ress <- grid.arrange(ress_fit,ress_qq, ress_hist, ncol=3, nrow=1, widths =c(3, 3, 3))
+    
+    return(grid.arrange(p, ress, ncol=1, nrow=2, heights =c(3, 2)))
+  })
   
+  ######################################Multiple#################################################
+
+  selected_reg_data_m <- reactive({eval(parse(text = paste(input$m_regression_dat)))})
   
+  output$m_reg_depen_var_ui <- renderUI({
+    selectInput(
+      inputId = "m_reg_depen_var",
+      label = "Dependent Variable",
+      choices = c(names(selected_reg_data_m()),""),
+      selected = ""
+    )
+  })
+  
+  output$m_reg_indepen_var_ui <- renderUI({
+    checkboxGroupInput(
+      inputId = "m_reg_indepen_var",
+      label = "Independent Variable",
+      choices = c(names(selected_reg_data_m())[names(selected_reg_data_m())!=input$m_reg_depen_var]),
+      inline = TRUE
+    )
+  })
+  
+
+  m_reg_fit_lm <- reactive({lm(selected_reg_data_m()[,colnames(selected_reg_data_m())==input$m_reg_depen_var]
+                               ~ selected_reg_data_m()[,colnames(selected_reg_data_m())==input$m_reg_indepen_var]
+                            )
+  })
+#   
+#   output$s_regression_par1 <- renderUI({
+#     sliderInput(
+#       inputId = "s_regression_par_intercept", 
+#       label = "Intercept", 
+#       min = (s_reg_fit_lm()$coe[1]-5),
+#       max = (s_reg_fit_lm()$coe[1]+5), 
+#       value = s_reg_fit_lm()$coe[1], 
+#       step = 0.01
+#     )
+#   })
+#   
+#   output$s_regression_par2 <- renderUI({
+#     sliderInput(
+#       inputId = "s_regression_par_slope", 
+#       label = "Slope", 
+#       min = (s_reg_fit_lm()$coe[2]-5) ,
+#       max = (s_reg_fit_lm()$coe[2]+5), 
+#       value = s_reg_fit_lm()$coe[2], 
+#       step = 0.01
+#     )
+#   })
+#   
+#   output$s_regression_main <- renderPlot({
+#     plot(selected_reg_data_s()[,colnames(selected_reg_data_s())==input$s_reg_indepen_var],
+#          selected_reg_data_s()[,colnames(selected_reg_data_s())==input$s_reg_depen_var],
+#          type = "p", pch = 20,col="gray",
+#          xlab=input$s_reg_indepen_var,
+#          ylab=input$s_reg_depen_var
+#     )
+#     if(input$fit_s_reg)abline(s_reg_fit_lm())
+#     else abline(a = input$s_regression_par_intercept, b = input$s_regression_par_slope)
+#     for(i in 1:nrow(selected_reg_data_s())){
+#       lines(rep(selected_reg_data_s()[i,colnames(selected_reg_data_s())==input$s_reg_indepen_var],2),
+#             c(input$s_regression_par_intercept + input$s_regression_par_slope*selected_reg_data_s()[i,colnames(selected_reg_data_s())==input$s_reg_indepen_var],
+#               selected_reg_data_s()[i,colnames(selected_reg_data_s())==input$s_reg_depen_var]),
+#             col = "red"
+#       )
+#     }
+#   })
   
   
   
